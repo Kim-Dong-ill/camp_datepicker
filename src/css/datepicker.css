@@ -81,16 +81,16 @@
 
 /* 범위의 시작 스타일 */
 .custom-datepicker .react-datepicker__day--in-range.react-datepicker__day--range-start {
-    border-top-left-radius: 50px;
-    border-bottom-left-radius: 50px;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
     background-color: #3F71D1;
     color: #fff;
 }
 
 /* 범위의 시작 스타일 */
 .custom-datepicker .react-datepicker__day--in-range.react-datepicker__day--range-end {
-    border-top-right-radius: 50px;
-    border-bottom-right-radius: 50px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
     background-color: #3F71D1;
     color: #fff;
 }
@@ -111,13 +111,14 @@
 
 /* 오늘 날짜 스타일 */
 .custom-datepicker .react-datepicker__day--today {
+    border-radius: 10px;
     border: 2px solid #3F71D1;
     background-color: #fff;
     color: #3F71D1;
     font-weight: bold;
 }
 
-/* Style for the range being selected (dragging) */
+/* 드래그시 범위 스타일 */
 .custom-datepicker .react-datepicker__day--in-selecting-range {
     background-color: #3F71D1 !important;
     color: #fff;
@@ -151,4 +152,12 @@
 .disabled-datepicker .react-datepicker__day--in-range {
     background-color: inherit !important;
     color: inherit !important;
+}
+
+/* 예약된 날짜 스타일*/
+.disabled-datepicker .react-datepicker__day--disabled {
+    color: #fff;
+    pointer-events: none;
+    background-color: #3F71D1;
+    border-radius: 10px;
 }

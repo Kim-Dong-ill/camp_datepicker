@@ -17,6 +17,11 @@ registerLocale("ko", ko);
 //예약하려는 날짜의 캠핑장 날씨 정보 제공
 
 function App() {
+  const API_KEY = "db5e9fc650822da7c6cc328c5ec59bdf"
+  const lang = "kr"
+  const [weatherData, serWeatherData] = useState();
+  const iconSection = document.querySelector('.weatherIcon');
+
   const [dateRange, setDataRange] = useState([null, null]);
   const [startDate, endDate] = dateRange;
   const [reservations, setReservations] = useState([]);
@@ -100,13 +105,84 @@ function App() {
   };
 
   //초기화 함수
-  const clearReservation = (startDate, endDate) => {
+  const clearReservation = () => {
     setDataRange([null, null])
+  }
+
+
+
+
+  //위치값 가져오기
+  const getPosition = () => {
+    navigator.geolocation.getCurrentPosition(success, fail);
+  }
+
+  //위치값 성공
+  const success = (position) => {
+    console.log(position);
+
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+
+    getWeather(latitude, longitude)
+  }
+
+  //위치값 실패
+  const fail = () => {
+    alert("좌표를 받아올 수 없음");
+  }
+
+  //날씨 가져오기
+  const getWeather = async (lat, lon) => {
+    try {
+      const res = await axios.post(
+        `https://api.openweathermap.org/data/2.5/weather?lang=${lang}&lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
+      )
+      console.log(res.data);
+
+      let iconURL;
+
+      //만들 아이콘일 경우
+      const customIcon = res.data.weather[0].main
+      switch (customIcon) {
+        case "Clear":
+          iconURL = "./weatherIcon/sunny.png";
+          break;
+        case "Wind":
+          iconURL = "./weatherIcon/windy.png";
+          break;
+        case "Clouds":
+          iconURL = `./weatherIcon/cloud.png`;
+          break;
+        case "Rain":
+          iconURL = "./weatherIcon/sleety.png";
+          break;
+        case "Snow":
+          iconURL = "./weatherIcon/snow.png";
+          break;
+      }
+
+      iconSection.setAttribute('src', iconURL);
+      serWeatherData(res.data);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
     <div>
       <h1>예약 시스템</h1>
+      <div>날씨 정보</div>
+
+      <div>지역 : {weatherData?.name}</div>
+      <div>날씨 : {weatherData?.weather[0].description}</div>
+      <img className='weatherIcon'></img>
+      <div>온도 : {weatherData?.main.temp}도</div>
+      <div>체감온도 : {weatherData?.main.feels_like}도</div>
+      <div>최저기온 : {weatherData?.main.temp_min}도</div>
+      <div>최고기온 : {weatherData?.main.temp_max}도</div>
+      <div>풍속 : 초속 {weatherData?.wind.speed}m</div>
+
       <div>{startDate ? formattedStartDate : ""} ~ {endDate ? formattedEndDate : ""}</div>
       <DatePicker
         calendarClassName="custom-datepicker"
@@ -128,6 +204,8 @@ function App() {
 
       <button onClick={handleReservation}>예약하기</button>
       <button onClick={clearReservation}>달력 초기화</button>
+      <button onClick={getPosition}>날씨 가져오기</button>
+
       <div>캠핑 시작일 : {reservations.startDate}</div>
       <div>캠핑 마감일 : {reservations.endDate}</div>
       <br></br>
@@ -141,17 +219,9 @@ function App() {
       <div>
         <DatePicker
           calendarClassName="disabled-datepicker"
-          // selectsRange={true}
           dateFormat="yyyy년 MM월 dd일"
           dateFormatCalendar="yyyy년 MM월"
           locale="ko"
-          // selected={startDate}
-          // onChange={(update) => setDataRange(update)}
-          // selectsStart
-          // startDate={startDate}
-          // endDate={endDate}
-          // minDate={new Date()}
-          // excludeDates={startDate ? [startDate] : []}
           readOnly={true}
           disabled={true}
           filterDate={date => !isDateDisabled(date)}
