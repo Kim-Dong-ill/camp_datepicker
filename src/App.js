@@ -12,6 +12,10 @@ import { format, isWithinInterval } from 'date-fns';
 
 registerLocale("ko", ko);
 
+//사용자 개인 예약 날짜를 볼수 있는 달력
+//예약 완료시 이메일로 예약 확인 보냄
+//예약하려는 날짜의 캠핑장 날씨 정보 제공
+
 function App() {
   const [dateRange, setDataRange] = useState([null, null]);
   const [startDate, endDate] = dateRange;
@@ -95,11 +99,17 @@ function App() {
     );
   };
 
+  //초기화 함수
+  const clearReservation = (startDate, endDate) => {
+    setDataRange([null, null])
+  }
+
   return (
     <div>
       <h1>예약 시스템</h1>
       <div>{startDate ? formattedStartDate : ""} ~ {endDate ? formattedEndDate : ""}</div>
       <DatePicker
+        calendarClassName="custom-datepicker"
         selectsRange={true}
         dateFormat="yyyy년 MM월 dd일"
         dateFormatCalendar="yyyy년 MM월"
@@ -109,14 +119,15 @@ function App() {
         selectsStart
         startDate={startDate}
         endDate={endDate}
-        minDate={new Date()}
+        minDate={startDate ? startDate : new Date()}
         excludeDates={startDate ? [startDate] : []}
         filterDate={date => !isDateDisabled(date)}
         inline={true}
         isClearable={true}
       />
 
-      <button onClick={handleReservation}>예약</button>
+      <button onClick={handleReservation}>예약하기</button>
+      <button onClick={clearReservation}>달력 초기화</button>
       <div>캠핑 시작일 : {reservations.startDate}</div>
       <div>캠핑 마감일 : {reservations.endDate}</div>
       <br></br>
@@ -124,6 +135,30 @@ function App() {
       {reservationed.map((item, idx) => {
         return (<div key={idx}>{idx + 1}. {item.startDate} ~ {item.endDate}</div>)
       })}
+
+      {/* 사용자 예약 날짜 달력 */}
+      <h1>사용자 예약 달력s</h1>
+      <div>
+        <DatePicker
+          calendarClassName="disabled-datepicker"
+          // selectsRange={true}
+          dateFormat="yyyy년 MM월 dd일"
+          dateFormatCalendar="yyyy년 MM월"
+          locale="ko"
+          // selected={startDate}
+          // onChange={(update) => setDataRange(update)}
+          // selectsStart
+          // startDate={startDate}
+          // endDate={endDate}
+          // minDate={new Date()}
+          // excludeDates={startDate ? [startDate] : []}
+          readOnly={true}
+          disabled={true}
+          filterDate={date => !isDateDisabled(date)}
+          inline={true}
+          isClearable={true}
+        />
+      </div>
     </div>
   );
 }
