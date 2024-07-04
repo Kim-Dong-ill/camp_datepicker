@@ -19,6 +19,7 @@ registerLocale("ko", ko);
 function App() {
   const API_KEY = "db5e9fc650822da7c6cc328c5ec59bdf"
   const lang = "kr"
+  const cnt = 30;
   const [weatherData, serWeatherData] = useState();
   const iconSection = document.querySelector('.weatherIcon');
 
@@ -125,6 +126,7 @@ function App() {
     const longitude = position.coords.longitude;
 
     getWeather(latitude, longitude)
+    get5Position(latitude, longitude)
   }
 
   //위치값 실패
@@ -138,7 +140,7 @@ function App() {
       const res = await axios.post(
         `https://api.openweathermap.org/data/2.5/weather?lang=${lang}&lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
       )
-      console.log(res.data);
+      // console.log(res.data);
 
       let iconURL;
 
@@ -169,6 +171,31 @@ function App() {
     }
   }
 
+  //5일치 날씨 가져오기
+  const get5Position = async (lat, lon) => {
+    console.log(lat);
+    console.log(lon);
+    try {
+      const res = await axios.get(
+        `https://api.openweathermap.org/data/2.5/forecast?lang=${lang}&lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
+      );
+      console.log(res.data);
+    } catch (error) {
+      if (error.response) {
+        // 서버가 2xx 범위를 벗어나는 상태 코드로 응답한 경우
+        console.error("Error response:", error.response.data);
+        console.error("Status code:", error.response.status);
+      } else if (error.request) {
+        // 요청이 이루어졌으나 응답을 받지 못한 경우
+        console.error("No response received:", error.request);
+      } else {
+        // 요청 설정 중에 오류가 발생한 경우
+        console.error("Error:", error.message);
+      }
+    }
+
+  }
+
   return (
     <div>
       <h1>예약 시스템</h1>
@@ -176,6 +203,7 @@ function App() {
 
       <div>지역 : {weatherData?.name}</div>
       <div>날씨 : {weatherData?.weather[0].description}</div>
+      <div>날씨 : {weatherData?.weather[0].main}</div>
       <img className='weatherIcon'></img>
       <div>온도 : {weatherData?.main.temp}도</div>
       <div>체감온도 : {weatherData?.main.feels_like}도</div>
@@ -205,6 +233,7 @@ function App() {
       <button onClick={handleReservation}>예약하기</button>
       <button onClick={clearReservation}>달력 초기화</button>
       <button onClick={getPosition}>날씨 가져오기</button>
+      <button onClick={getPosition}>16일치 날씨 가져오기</button>
 
       <div>캠핑 시작일 : {reservations.startDate}</div>
       <div>캠핑 마감일 : {reservations.endDate}</div>
