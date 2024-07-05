@@ -10,11 +10,12 @@
 }
 
 .weathersIcon {
-    scale: 1.2;
+    /* scale: 1.2; */
     position: absolute;
     padding: 3px;
     top: 0;
-    right: 0;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 /*--------------------------------------------  예약용 달력 -------------------------------------------*/
@@ -57,7 +58,7 @@
     position: relative;
     width: 66px;
     height: 40px;
-    line-height: 40px;
+    line-height: 60px;
     font-size: 13px;
     color: #535353;
     font-weight: normal;

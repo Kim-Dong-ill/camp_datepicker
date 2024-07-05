@@ -212,6 +212,7 @@ function App() {
     const formattedDate = format(date, 'yyyy-MM-dd');
     if (weathersData) {
       const dailyWeather = weathersData[formattedDate];
+
       let iconURL;
 
       switch (dailyWeather?.main) {
