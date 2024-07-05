@@ -9,6 +9,14 @@
     margin-right: 15px;
 }
 
+.weathersIcon {
+    scale: 1.2;
+    position: absolute;
+    padding: 3px;
+    top: 0;
+    right: 0;
+}
+
 /*--------------------------------------------  예약용 달력 -------------------------------------------*/
 
 .react-datepicker {
@@ -46,6 +54,7 @@
 
 /* 달력 cell */
 .custom-datepicker .react-datepicker__day {
+    position: relative;
     width: 66px;
     height: 40px;
     line-height: 40px;
@@ -156,8 +165,8 @@
 
 /* 예약된 날짜 스타일*/
 .disabled-datepicker .react-datepicker__day--disabled {
-    color: #fff;
-    pointer-events: none;
-    background-color: #3F71D1;
-    border-radius: 10px;
+    color: #fff !important;
+    pointer-events: none !important;
+    background-color: #3F71D1 !important;
+    border-radius: 10px !important;
 }

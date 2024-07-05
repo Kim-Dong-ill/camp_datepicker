@@ -19,9 +19,10 @@ registerLocale("ko", ko);
 function App() {
   const API_KEY = "db5e9fc650822da7c6cc328c5ec59bdf"
   const lang = "kr"
-  const cnt = 30;
-  const [weatherData, serWeatherData] = useState();
+  const [weatherData, setWeatherData] = useState();
+  const [weathersData, setWeathersData] = useState();
   const iconSection = document.querySelector('.weatherIcon');
+  const iconsSection = document.querySelector('.weathersIcon');
 
   const [dateRange, setDataRange] = useState([null, null]);
   const [startDate, endDate] = dateRange;
@@ -40,6 +41,7 @@ function App() {
 
   useEffect(() => {
     fetchReservations();
+    getPosition();
   }, []);
 
   //DB에서 예약 리스트 가져오기
@@ -140,7 +142,6 @@ function App() {
       const res = await axios.post(
         `https://api.openweathermap.org/data/2.5/weather?lang=${lang}&lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
       )
-      // console.log(res.data);
 
       let iconURL;
 
@@ -165,7 +166,7 @@ function App() {
       }
 
       iconSection.setAttribute('src', iconURL);
-      serWeatherData(res.data);
+      setWeatherData(res.data);
     } catch (error) {
       console.log(error);
     }
@@ -180,6 +181,16 @@ function App() {
         `https://api.openweathermap.org/data/2.5/forecast?lang=${lang}&lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`
       );
       console.log(res.data);
+      //
+      const weatherByDate = res.data.list.reduce((acc, currentValue) => {
+        const date = format(new Date(currentValue.dt * 1000), 'yyyy-MM-dd');
+        if (!acc[date]) {
+          acc[date] = currentValue.weather[0];
+        }
+        return acc;
+      }, {});
+      setWeathersData(weatherByDate)
+      //
     } catch (error) {
       if (error.response) {
         // 서버가 2xx 범위를 벗어나는 상태 코드로 응답한 경우
@@ -192,6 +203,48 @@ function App() {
         // 요청 설정 중에 오류가 발생한 경우
         console.error("Error:", error.message);
       }
+    }
+
+  }
+
+  //달력의 cell에 데이터 넣기
+  const renderDayContents = (day, date) => {
+    const formattedDate = format(date, 'yyyy-MM-dd');
+    if (weathersData) {
+      const dailyWeather = weathersData[formattedDate];
+      let iconURL;
+
+      switch (dailyWeather?.main) {
+        case "Clear":
+          iconURL = "./weatherIcon/sunny.png";
+          break;
+        case "Wind":
+          iconURL = "./weatherIcon/windy.png";
+          break;
+        case "Clouds":
+          iconURL = `./weatherIcon/cloud.png`;
+          break;
+        case "Rain":
+          iconURL = "./weatherIcon/sleety.png";
+          break;
+        case "Snow":
+          iconURL = "./weatherIcon/snow.png";
+          break;
+      }
+      // iconsSection.setAttribute("src", iconURL)
+      return (
+        <div>
+          <span>{day}</span>
+          {dailyWeather && (
+            <img
+              className='weathersIcon'
+              src={iconURL}
+              alt={dailyWeather.description}
+              style={{ width: '20px', height: '20px' }}
+            />
+          )}
+        </div>
+      );
     }
 
   }
@@ -228,12 +281,13 @@ function App() {
         filterDate={date => !isDateDisabled(date)}
         inline={true}
         isClearable={true}
+        renderDayContents={renderDayContents}
       />
 
       <button onClick={handleReservation}>예약하기</button>
       <button onClick={clearReservation}>달력 초기화</button>
       <button onClick={getPosition}>날씨 가져오기</button>
-      <button onClick={getPosition}>16일치 날씨 가져오기</button>
+      {/* <button onClick={getPosition}>4일치 날씨 가져오기</button> */}
 
       <div>캠핑 시작일 : {reservations.startDate}</div>
       <div>캠핑 마감일 : {reservations.endDate}</div>
